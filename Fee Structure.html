@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fee Calculator</title>
+    <!-- Link to Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #121212; /* Dark mode background */
+            color: #FFFFFF; /* Text color for dark mode */
+            margin: 20px auto;
+            max-width: 350px;
+            padding: 0 20px;
+        }
+        h1 {
+            text-align: center;
+            font-weight: 600;
+        }
+        .input-group {
+            margin-top: 25px; /* Increased from 15px to 25px */
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-top: 10px;
+            color: #FFFFFF;
+        }
+        input[type="number"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px;
+            margin-top: 5px;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            background-color: #1E1E1E;
+            color: #FFFFFF;
+            border: 1px solid #333333;
+            border-radius: 4px;
+        }
+        .slider-container {
+            margin-top: 35px; /* Increased from 25px to 35px */
+        }
+        .slider-label {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #FFFFFF;
+        }
+        .slider-wrapper {
+            position: relative;
+            height: 30px;
+        }
+        .slider-values {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            margin-top: 10px; /* Increased from 5px to 10px */
+            color: #AAAAAA;
+        }
+        .slider-values span {
+            flex: 0 0 auto;
+        }
+        .slider-values .slider-current-value {
+            flex: 1;
+            text-align: center;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            margin: 0;
+            background: transparent;
+            position: absolute;
+            top: 10px;
+        }
+        input[type="range"]:focus {
+            outline: none;
+        }
+        /* Slider Thumb */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            background: #4CAF50;
+            cursor: pointer;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+            border: none;
+            margin-top: -6px; /* Centers the thumb vertically */
+        }
+        /* Slider Track */
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 4px;
+            background: linear-gradient(to right, #4CAF50 0%, #4CAF50 var(--percent), #555555 var(--percent), #555555 100%);
+            border-radius: 2px;
+            position: relative;
+            z-index: 1;
+        }
+        /* For Firefox */
+        input[type="range"]::-moz-range-thumb {
+            height: 16px;
+            width: 16px;
+            background: #4CAF50;
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+        input[type="range"]::-moz-range-track {
+            height: 4px;
+            background: #555555;
+            border-radius: 2px;
+        }
+        input[type="range"]::-moz-range-progress {
+            background-color: #4CAF50;
+            height: 4px;
+        }
+        #calculate-btn {
+            margin-top: 40px; /* Increased from 30px to 40px */
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+        }
+        #calculate-btn:hover {
+            background-color: #45a049;
+        }
+        #result {
+            margin-top: 40px; /* Increased from 30px to 40px */
+            font-size: 18px;
+            color: #FFFFFF;
+        }
+        #result p {
+            margin: 5px 0;
+        }
+        .breakdown {
+            margin-left: 10px;
+            font-size: 16px;
+        }
+        .breakdown p {
+            margin: 5px 0; /* Increased from 3px to 5px */
+        }
+        .breakdown .line-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        .total-line {
+            border-top: 2px solid #FFFFFF;
+            margin-top: 15px; /* Increased from 10px to 15px */
+            padding-top: 10px;
+            font-weight: 600;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Fee Calculator</h1>
+
+<div class="input-group">
+    <label for="baseRate">Base Fee per Square Foot ($)</label>
+    <input type="number" id="baseRate" value="3" step="0.01" min="0">
+</div>
+
+<div class="input-group">
+    <label for="squareFootage">Gross Square Footage (sq ft)</label>
+    <input type="number" id="squareFootage" value="500" step="1" min="0">
+</div>
+
+<!-- Complexity Multiplier Slider -->
+<div class="slider-container">
+    <label class="slider-label" for="complexityMultiplier">Complexity Multiplier:</label>
+    <div class="slider-wrapper">
+        <input type="range" id="complexityMultiplier" min="1.0" max="2.0" step="0.2" value="1.0">
+    </div>
+    <div class="slider-values">
+        <span>1.0</span>
+        <span id="complexityValue" class="slider-current-value">1.0</span>
+        <span>2.0</span>
+    </div>
+</div>
+
+<!-- Site Factor Multiplier Slider -->
+<div class="slider-container">
+    <label class="slider-label" for="siteMultiplier">Site Factor Multiplier:</label>
+    <div class="slider-wrapper">
+        <input type="range" id="siteMultiplier" min="1.0" max="1.5" step="0.25" value="1.0">
+    </div>
+    <div class="slider-values">
+        <span>1.0</span>
+        <span id="siteValue" class="slider-current-value">1.00</span>
+        <span>1.5</span>
+    </div>
+</div>
+
+<!-- Schedule Factor Multiplier Slider -->
+<div class="slider-container">
+    <label class="slider-label" for="scheduleMultiplier">Schedule Factor Multiplier:</label>
+    <div class="slider-wrapper">
+        <input type="range" id="scheduleMultiplier" min="1.0" max="2.0" step="0.5" value="1.0">
+    </div>
+    <div class="slider-values">
+        <span>1.0</span>
+        <span id="scheduleValue" class="slider-current-value">1.0</span>
+        <span>2.0</span>
+    </div>
+</div>
+
+<button id="calculate-btn">Calculate Fee</button>
+
+<div id="result"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Function to update slider values and positions
+    function updateSlider(sliderId, outputId, decimals) {
+        const slider = document.getElementById(sliderId);
+        const output = document.getElementById(outputId);
+
+        function setValue() {
+            const value = parseFloat(slider.value).toFixed(decimals);
+            output.innerText = value;
+
+            // Calculate percentage for filled-in track
+            const min = parseFloat(slider.min);
+            const max = parseFloat(slider.max);
+            const percent = (slider.value - min) / (max - min);
+
+            // For filled-in track
+            slider.style.setProperty('--percent', `${percent * 100}%`);
+        }
+
+        slider.addEventListener('input', setValue);
+        setValue();
+    }
+
+    // Initialize sliders with appropriate decimal places
+    updateSlider('complexityMultiplier', 'complexityValue', 1); // Single decimal
+    updateSlider('siteMultiplier', 'siteValue', 2);             // Two decimals
+    updateSlider('scheduleMultiplier', 'scheduleValue', 1);     // Single decimal
+
+    // Function to format numbers with commas
+    function formatNumber(num) {
+        return num.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    // Function to calculate the fee
+    function calculateFee() {
+        const baseRate = parseFloat(document.getElementById('baseRate').value) || 0;
+        const squareFootage = parseFloat(document.getElementById('squareFootage').value) || 0;
+        const complexityMultiplier = parseFloat(document.getElementById('complexityMultiplier').value) || 1.0;
+        const siteMultiplier = parseFloat(document.getElementById('siteMultiplier').value) || 1.0;
+        const scheduleMultiplier = parseFloat(document.getElementById('scheduleMultiplier').value) || 1.0;
+
+        const conceptDesignFee = 1000; // Fixed $1,000 concept design fee
+
+        // Calculate Base Fee
+        const baseFee = baseRate * squareFootage;
+
+        // Calculate individual adjustments based on the original Base Fee
+        const complexityAdjustment = baseFee * (complexityMultiplier - 1);
+        const siteAdjustment = baseFee * (siteMultiplier - 1);
+        const scheduleAdjustment = baseFee * (scheduleMultiplier - 1);
+
+        // Calculate Total Fee
+        const totalFee = baseFee + complexityAdjustment + siteAdjustment + scheduleAdjustment + conceptDesignFee;
+
+        // Display the breakdown
+        document.getElementById('result').innerHTML = `
+            <div class="breakdown">
+                <div class="line-item">
+                    <span>Concept Design Fee:</span>
+                    <span>$${formatNumber(conceptDesignFee)}</span>
+                </div>
+                <div class="line-item">
+                    <span>Base Fee:</span>
+                    <span>$${formatNumber(baseFee)}</span>
+                </div>
+                <div class="line-item">
+                    <span>Complexity Adjustment:</span>
+                    <span>$${formatNumber(complexityAdjustment)}</span>
+                </div>
+                <div class="line-item">
+                    <span>Site Adjustment:</span>
+                    <span>$${formatNumber(siteAdjustment)}</span>
+                </div>
+                <div class="line-item">
+                    <span>Schedule Adjustment:</span>
+                    <span>$${formatNumber(scheduleAdjustment)}</span>
+                </div>
+                <div class="total-line line-item">
+                    <span>Total Fee:</span>
+                    <span>$${formatNumber(totalFee)}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    // Attach event listener to the Calculate button
+    document.getElementById('calculate-btn').addEventListener('click', calculateFee);
+
+});
+</script>
+
+</body>
+</html>
