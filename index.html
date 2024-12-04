@@ -1,22 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Fee Calculator</title>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-        <!-- Your CSS and other head elements -->
-    </head>    
+<head>
     <meta charset="UTF-8">
     <title>Fee Calculator</title>
     <!-- Link to Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #121212; /* Dark mode background */
-            color: #FFFFFF; /* Text color for dark mode */
+            background-color: #121212;
+            color: #FFFFFF;
             margin: 20px auto;
-            max-width: 350px;
+            max-width: 400px;
             padding: 0 20px;
         }
         h1 {
@@ -24,12 +19,21 @@
             font-weight: 600;
         }
         .input-group {
-            margin-top: 25px; /* Increased from 15px to 25px */
+            margin-top: 25px;
         }
         label {
             display: block;
             font-weight: 600;
-            margin-top: 10px;
+            margin-bottom: 10px;
+            color: #FFFFFF;
+        }
+        .slider-label-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .slider-current-value {
+            font-weight: bold;
             color: #FFFFFF;
         }
         input[type="number"] {
@@ -45,41 +49,46 @@
             border-radius: 4px;
         }
         .slider-container {
-            margin-top: 35px; /* Increased from 25px to 35px */
-        }
-        .slider-label {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #FFFFFF;
+            margin-top: 35px;
         }
         .slider-wrapper {
             position: relative;
-            height: 30px;
+            height: 40px;
+        }
+        .slider-wrapper .ticks {
+            position: absolute;
+            top: 8px;
+            width: calc(100% - 16px); /* Account for thumb width */
+            left: 8px; /* Half of thumb width */
+            display: flex;
+            justify-content: space-between;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .slider-wrapper .ticks span {
+            width: 2px;
+            height: 12px;
+            background-color: #555555;
+            margin-top: 0px;
         }
         .slider-values {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             font-size: 14px;
-            margin-top: 10px; /* Increased from 5px to 10px */
+            margin-top: 10px;
             color: #AAAAAA;
         }
         .slider-values span {
             flex: 0 0 auto;
-        }
-        .slider-values .slider-current-value {
-            flex: 1;
-            text-align: center;
-            font-weight: bold;
-            color: #FFFFFF;
         }
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
             margin: 0;
             background: transparent;
-            position: absolute;
-            top: 10px;
+            position: relative;
+            z-index: 2;
+            padding: 0;
         }
         input[type="range"]:focus {
             outline: none;
@@ -92,18 +101,18 @@
             background: #4CAF50;
             cursor: pointer;
             border-radius: 50%;
-            position: relative;
-            z-index: 2;
             border: none;
-            margin-top: -6px; /* Centers the thumb vertically */
+            margin-top: -6px;
+            position: relative;
+            z-index: 3;
         }
         /* Slider Track */
         input[type="range"]::-webkit-slider-runnable-track {
             height: 4px;
+            margin-left: 8px;  /* Half of thumb width */
+            margin-right: 8px; /* Half of thumb width */
             background: linear-gradient(to right, #4CAF50 0%, #4CAF50 var(--percent), #555555 var(--percent), #555555 100%);
             border-radius: 2px;
-            position: relative;
-            z-index: 1;
         }
         /* For Firefox */
         input[type="range"]::-moz-range-thumb {
@@ -118,13 +127,37 @@
             height: 4px;
             background: #555555;
             border-radius: 2px;
+            margin-left: 8px;
+            margin-right: 8px;
         }
         input[type="range"]::-moz-range-progress {
             background-color: #4CAF50;
             height: 4px;
         }
+        /* For IE */
+        input[type="range"]::-ms-track {
+            height: 4px;
+            background: transparent;
+            border-color: transparent;
+            color: transparent;
+            margin-left: 8px;
+            margin-right: 8px;
+        }
+        input[type="range"]::-ms-fill-lower {
+            background: #4CAF50;
+        }
+        input[type="range"]::-ms-fill-upper {
+            background: #555555;
+        }
+        input[type="range"]::-ms-thumb {
+            height: 16px;
+            width: 16px;
+            background: #4CAF50;
+            border-radius: 50%;
+            border: none;
+        }
         #calculate-btn {
-            margin-top: 40px; /* Increased from 30px to 40px */
+            margin-top: 40px;
             padding: 10px;
             width: 100%;
             font-size: 16px;
@@ -139,30 +172,56 @@
             background-color: #45a049;
         }
         #result {
-            margin-top: 40px; /* Increased from 30px to 40px */
+            margin-top: 40px;
             font-size: 18px;
             color: #FFFFFF;
         }
-        #result p {
-            margin: 5px 0;
+        /* Table Styling */
+        .breakdown-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
         }
-        .breakdown {
-            margin-left: 10px;
-            font-size: 16px;
+        .breakdown-table td {
+            padding: 5px 0;
         }
-        .breakdown p {
-            margin: 5px 0; /* Increased from 3px to 5px */
+        .breakdown-table tr:not(:last-child) {
+            border-bottom: 1px solid #333;
         }
-        .breakdown .line-item {
-            display: flex;
-            justify-content: space-between;
+        .breakdown-table td:first-child {
+            text-align: left;
         }
-        .total-line {
-            border-top: 2px solid #FFFFFF;
-            margin-top: 15px; /* Increased from 10px to 15px */
-            padding-top: 10px;
+        .breakdown-table td:last-child {
+            text-align: right;
+        }
+        .total-line td {
             font-weight: 600;
             font-size: 20px;
+            padding-top: 10px;
+            border-top: 2px solid #FFFFFF;
+        }
+        /* Copy Button Styling */
+        #copy-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            background-color: #333333;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+        }
+        #copy-btn:hover {
+            background-color: #444444;
+        }
+        .copy-button-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        /* Hidden copy content */
+        #copy-content {
+            display: none;
         }
     </style>
 </head>
@@ -172,7 +231,7 @@
 
 <div class="input-group">
     <label for="baseRate">Base Fee per Square Foot ($)</label>
-    <input type="number" id="baseRate" value="3" step="0.01" min="0">
+    <input type="number" id="baseRate" value="4" step="0.01" min="0">
 </div>
 
 <div class="input-group">
@@ -182,40 +241,58 @@
 
 <!-- Complexity Multiplier Slider -->
 <div class="slider-container">
-    <label class="slider-label" for="complexityMultiplier">Complexity Multiplier:</label>
+    <div class="slider-label-container">
+        <label class="slider-label" for="complexityMultiplier">Complexity Multiplier:</label>
+        <span id="complexityValue" class="slider-current-value">0%</span>
+    </div>
     <div class="slider-wrapper">
-        <input type="range" id="complexityMultiplier" min="1.0" max="2.0" step="0.2" value="1.0">
+        <div class="ticks">
+            <!-- 11 tick marks for 0% to 100% in increments of 10% -->
+            <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <input type="range" id="complexityMultiplier" min="1.0" max="2.0" step="0.1" value="1.0">
     </div>
     <div class="slider-values">
-        <span>1.0</span>
-        <span id="complexityValue" class="slider-current-value">1.0</span>
-        <span>2.0</span>
+        <span>0%</span>
+        <span>100%</span>
     </div>
 </div>
 
 <!-- Site Factor Multiplier Slider -->
 <div class="slider-container">
-    <label class="slider-label" for="siteMultiplier">Site Factor Multiplier:</label>
+    <div class="slider-label-container">
+        <label class="slider-label" for="siteMultiplier">Site Factor Multiplier:</label>
+        <span id="siteValue" class="slider-current-value">0%</span>
+    </div>
     <div class="slider-wrapper">
-        <input type="range" id="siteMultiplier" min="1.0" max="1.5" step="0.25" value="1.0">
+        <div class="ticks">
+            <!-- 3 tick marks for 0% to 25% in increments of 12.5% -->
+            <span></span><span></span><span></span>
+        </div>
+        <input type="range" id="siteMultiplier" min="1.0" max="1.25" step="0.125" value="1.0">
     </div>
     <div class="slider-values">
-        <span>1.0</span>
-        <span id="siteValue" class="slider-current-value">1.00</span>
-        <span>1.5</span>
+        <span>0%</span>
+        <span>25%</span>
     </div>
 </div>
 
 <!-- Schedule Factor Multiplier Slider -->
 <div class="slider-container">
-    <label class="slider-label" for="scheduleMultiplier">Schedule Factor Multiplier:</label>
+    <div class="slider-label-container">
+        <label class="slider-label" for="scheduleMultiplier">Schedule Factor Multiplier:</label>
+        <span id="scheduleValue" class="slider-current-value">0%</span>
+    </div>
     <div class="slider-wrapper">
-        <input type="range" id="scheduleMultiplier" min="1.0" max="2.0" step="0.5" value="1.0">
+        <div class="ticks">
+            <!-- 3 tick marks for 0% to 50% in increments of 25% -->
+            <span></span><span></span><span></span>
+        </div>
+        <input type="range" id="scheduleMultiplier" min="1.0" max="1.5" step="0.25" value="1.0">
     </div>
     <div class="slider-values">
-        <span>1.0</span>
-        <span id="scheduleValue" class="slider-current-value">1.0</span>
-        <span>2.0</span>
+        <span>0%</span>
+        <span>50%</span>
     </div>
 </div>
 
@@ -223,17 +300,26 @@
 
 <div id="result"></div>
 
+<div class="copy-button-container">
+    <button id="copy-btn" style="display: none;">Copy</button>
+</div>
+
+<!-- Hidden copy content -->
+<div id="copy-content" style="display: none;"></div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update slider values and positions
-    function updateSlider(sliderId, outputId, decimals) {
+    function updateSlider(sliderId, outputId, maxPercentage, decimalPlaces) {
         const slider = document.getElementById(sliderId);
         const output = document.getElementById(outputId);
 
         function setValue() {
-            const value = parseFloat(slider.value).toFixed(decimals);
-            output.innerText = value;
+            const multiplier = parseFloat(slider.value);
+            const percentage = ((multiplier - parseFloat(slider.min)) / (parseFloat(slider.max) - parseFloat(slider.min))) * maxPercentage;
+            const roundedPercentage = percentage.toFixed(decimalPlaces);
+            output.innerText = `${roundedPercentage}%`;
 
             // Calculate percentage for filled-in track
             const min = parseFloat(slider.min);
@@ -248,10 +334,10 @@ document.addEventListener('DOMContentLoaded', function() {
         setValue();
     }
 
-    // Initialize sliders with appropriate decimal places
-    updateSlider('complexityMultiplier', 'complexityValue', 1); // Single decimal
-    updateSlider('siteMultiplier', 'siteValue', 2);             // Two decimals
-    updateSlider('scheduleMultiplier', 'scheduleValue', 1);     // Single decimal
+    // Initialize sliders with appropriate percentages
+    updateSlider('complexityMultiplier', 'complexityValue', 100, 0); // Max 100%, 0 decimal places
+    updateSlider('siteMultiplier', 'siteValue', 25, 1);             // Max 25%, 1 decimal place
+    updateSlider('scheduleMultiplier', 'scheduleValue', 50, 0);     // Max 50%, 0 decimal places
 
     // Function to format numbers with commas
     function formatNumber(num) {
@@ -267,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const scheduleMultiplier = parseFloat(document.getElementById('scheduleMultiplier').value) || 1.0;
 
         const conceptDesignFee = 1000; // Fixed $1,000 concept design fee
+        const designDocumentationFee = 4000; // Fixed $4,000 design & documentation fee
 
         // Calculate Base Fee
         const baseFee = baseRate * squareFootage;
@@ -277,41 +364,122 @@ document.addEventListener('DOMContentLoaded', function() {
         const scheduleAdjustment = baseFee * (scheduleMultiplier - 1);
 
         // Calculate Total Fee
-        const totalFee = baseFee + complexityAdjustment + siteAdjustment + scheduleAdjustment + conceptDesignFee;
+        const totalFee = baseFee + complexityAdjustment + siteAdjustment + scheduleAdjustment + conceptDesignFee + designDocumentationFee;
+
+        // Prepare the calculation result for display
+        const calculationResult = `
+            <table class="breakdown-table">
+                <tr>
+                    <td>Concept Design Fee:</td>
+                    <td>$${formatNumber(conceptDesignFee)}</td>
+                </tr>
+                <tr>
+                    <td>Design &amp; Documentation Fee:</td>
+                    <td>$${formatNumber(designDocumentationFee)}</td>
+                </tr>
+                <tr>
+                    <td>Base Fee:</td>
+                    <td>$${formatNumber(baseFee)}</td>
+                </tr>
+                <tr>
+                    <td>Complexity Adjustment:</td>
+                    <td>$${formatNumber(complexityAdjustment)}</td>
+                </tr>
+                <tr>
+                    <td>Site Adjustment:</td>
+                    <td>$${formatNumber(siteAdjustment)}</td>
+                </tr>
+                <tr>
+                    <td>Schedule Adjustment:</td>
+                    <td>$${formatNumber(scheduleAdjustment)}</td>
+                </tr>
+                <tr class="total-line">
+                    <td>Total Fee:</td>
+                    <td>$${formatNumber(totalFee)}</td>
+                </tr>
+            </table>
+        `;
 
         // Display the breakdown
-        document.getElementById('result').innerHTML = `
-            <div class="breakdown">
-                <div class="line-item">
-                    <span>Concept Design Fee:</span>
-                    <span>$${formatNumber(conceptDesignFee)}</span>
-                </div>
-                <div class="line-item">
-                    <span>Base Fee:</span>
-                    <span>$${formatNumber(baseFee)}</span>
-                </div>
-                <div class="line-item">
-                    <span>Complexity Adjustment:</span>
-                    <span>$${formatNumber(complexityAdjustment)}</span>
-                </div>
-                <div class="line-item">
-                    <span>Site Adjustment:</span>
-                    <span>$${formatNumber(siteAdjustment)}</span>
-                </div>
-                <div class="line-item">
-                    <span>Schedule Adjustment:</span>
-                    <span>$${formatNumber(scheduleAdjustment)}</span>
-                </div>
-                <div class="total-line line-item">
-                    <span>Total Fee:</span>
-                    <span>$${formatNumber(totalFee)}</span>
-                </div>
-            </div>
-        `;
+        document.getElementById('result').innerHTML = calculationResult;
+
+        // Prepare the formatted content for copying
+        document.getElementById('copy-content').innerHTML = calculationResult;
+
+        // Show the Copy button
+        document.getElementById('copy-btn').style.display = 'inline-block';
     }
 
     // Attach event listener to the Calculate button
     document.getElementById('calculate-btn').addEventListener('click', calculateFee);
+
+    // Function to copy the result to clipboard with formatting
+    function copyToClipboard() {
+        const copyContent = document.getElementById('copy-content');
+
+        // Create a temporary contenteditable div
+        const tempDiv = document.createElement('div');
+        tempDiv.contentEditable = true;
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+
+        // Append the copy content to the temp div
+        tempDiv.innerHTML = copyContent.innerHTML;
+
+        document.body.appendChild(tempDiv);
+
+        // Select the content
+        const range = document.createRange();
+        range.selectNodeContents(tempDiv);
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        // Execute the copy command
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                alert('Calculation copied to clipboard with formatting.');
+            } else {
+                throw new Error('Copy command was unsuccessful');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Failed to copy with formatting. Copying as plain text.');
+            // Fallback to plain text
+            copyPlainTextToClipboard(copyContent.innerText);
+        }
+
+        // Cleanup
+        selection.removeAllRanges();
+        document.body.removeChild(tempDiv);
+    }
+
+    function copyPlainTextToClipboard(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                alert('Calculation copied to clipboard.');
+            } else {
+                alert('Failed to copy.');
+            }
+        } catch (err) {
+            alert('Failed to copy.');
+        }
+
+        document.body.removeChild(textarea);
+    }
+
+    // Attach event listener to the Copy button
+    document.getElementById('copy-btn').addEventListener('click', copyToClipboard);
 
 });
 </script>
